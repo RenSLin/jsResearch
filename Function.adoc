@@ -1,0 +1,15 @@
+:source-highlighter: highlight.js
+:highlightjs-theme: atom-one-dark-reasonable
+= JavaScript Functions
+
+== This
+* value defined by how function is invoked, not definition
+* refer to a context where a piece of code suppose to run
+    ** in an object method call, it will refer to the obj
+    ** in a function without object attached, it is refer to a global object/undefined (in nodejs is global, in web is window)
+    ** In arrow function this points to the parent scope when it is defined
+    ** points at object instance, so if object isnt there then there is no point really 
+    ** call bind apply
+    *** 
+    ***
+    ***
