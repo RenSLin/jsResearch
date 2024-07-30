@@ -1,0 +1,331 @@
+:source-highlighter: highlight.js
+:highlightjs-theme: atom-one-dark-reasonable
+
+== 1.型別
+=== 原始型別/物件型別
+
+(可以使用 typeof 檢視型別)
+
+.原始型別：
+* Number
+* String
+* Boolean
+* Undefined
+* Null
+* Symbol --ES6新增
+* BigInt --ES2020新增
+
+[source,javascript]
+----
+let num = 42;
+let str = "Hello";
+let bool = true;
+let undef = undefined;
+let nul = null;
+let sym = Symbol("unique");
+let bigInt = 1234567890123456789012345678901234567890n;
+----
+.物件型別：
+* Object
+    ** Array
+    ** Function
+    ** Date
+    ** RegExp
+
+[source,javascript]
+----
+let obj = {name: "John", age: 30};
+let arr = [1, 2, 3, 4];
+let func = function() { console.log("Hello"); };
+let date = new Date();
+let regex = /abc/;
+----
+
+=== 顯性轉換/隱性轉換
+
+.顯性轉換：
+顯性轉換是通過特定函數明確進行的轉換。
+
+* 強制轉型
+
+1. Number(): 將值轉換為數字。
++
+[source,javascript]
+----
+let num1 = Number("42");     // 42
+let num2 = Number("Hello");  // NaN
+----
+
+2. String(): 將值轉換為字符串。
++
+[source,javascript]
+----
+let str1 = String(42);     // "42"
+let str2 = String(true);   // "true"
+----
+
+3. Boolean(): 將值轉換為布爾值。
++
+[source,javascript]
+----
+let bool1 = Boolean(1);     // true
+let bool2 = Boolean("");    // false
+----
+
+4. Object(): 將值轉換為物件。
++
+[source,javascript]
+----
+let obj1 = Object(42);    // Number {42}
+let obj2 = Object("Hi");  // String {"Hi"}
+----
+
+* 方法轉型
+** ParseInt()
+** ToString()
+
+.隱性轉換：
+1. Number + String = String
++
+[source,javascript]
+----
+    let str1 = "123";
+    let num1 = 456;
+    let result1 = str1 + num1;
+    console.log(result1); // "123456"
+    console.log(typeof(result1)); // String
+----
+2. Number + Boolean = Number
++
+[source,javascript]
+----
+    let num2 = 1;
+    let bool2 = true;  // true 被隱性轉換為 1
+    let result2 = num2 + bool2;
+    console.log(result2);      // 輸出: 2
+    console.log(typeof(result2)); // Number
+----
+3. String + Boolean = String
++
+[source,javascript]
+----
+    let str3 = "123";
+    let bool3 = true;
+    let result3 = str3 + bool3;
+    console.log(result3);      // "123true"
+    console.log(typeof(result3)); //String
+----
+4. Array + Object = String
++
+[source,javascript]
+----
+    let str = [1,2,3];
+    let car = {
+        color: "red",
+        price: 100
+    };
+    let result = str + car;
+    console.log(result);      // 1,2,3[object Object]
+    console.log(typeof(result)); //String
+----
+
+=== 型別比較
+
+.Strict and loose equality (== vs ===)
+* 這兩個最主要的差別，在於 === 會多比較型態的部份。
+
+[source,javascript]
+----
+let str4 = "123";
+        let num4 = 123;
+        
+        console.log(str4 == num4); // true
+        console.log(str4 === num4); // false
+----
+* 比較+隱形轉換
+
+[source,javascript]
+----
+    let num5 = 123;
+    let str5 = "123";
+    let result5 = num5 == str5;  // true，因為 "123" 被隱性轉換為 123
+    console.log(result5);      // 輸出: true
+    console.log(typeof(result5)); // boolean
+----
+
+== 2.函式
+=== Immediately Invoked Function Expression, IIFE
+==== 是一個定義完馬上就執行的函式。
+[source,javascript]
+----
+    function my_func(){
+        console.log("執行這裡");
+    }
+----
+==== 如果希望這個函式宣告完之後，馬上執行，且也只希望執行一次，也就是 IIFE，按照以下兩個步驟：
+==== 1. 用小括號包起來，表示避免函式的宣告。
+==== 2. 緊接著再加上小括號，表示要執行該函式。
+[source,javascript]
+----
+    (function my_func(){
+        console.log("執行這裡");
+    })();
+    my_func(); // 這裡可以繼續呼叫嗎？不行的，因為不存在該函式。
+
+----
+=== 高階函式 Higher-Order Function
+==== 當一個函式可以接受另一個函式作為參數，或者返回一個函式作為結果的函式
+
+
+.字串
+[source,javascript]
+----
+const print = (message) => {
+    console.log(`這是print ${message}`)
+}
+
+const helloMessage = () => {
+    return "Hello Message"
+}
+
+print(helloMessage());
+// 這是print Hello Message
+----
+
+.陣列
+[source,javascript]
+----
+const array = ["item0", (message) => console.log("我是陣列[1] " + message)]
+
+console.log(array[0]);
+// item0
+array[1]("Hello");
+// 我是陣列[1] Hello
+----
+
+.物件
+[source,javascript]
+----
+const hello = {
+    helloWorld: "Hello World",
+    print: (message) => {
+        console.log(`我是print  ${message}`)
+    }
+}
+
+object.print(hello.helloWorld);
+// 我是print Hello World
+----
+
+=== 閉包 Closure
+==== 閉包是指一個函數可以記住並訪問它的詞法作用域，即使這個函數在其詞法作用域之外被調用。換句話說，閉包允許你從內部函數訪問外部函數的變量。
+[source,javascript]
+----
+
+    function createCounter() {
+        var count = 0;
+
+        return {
+            increment: function() {
+                count++;
+                return count;
+            },
+            decrement: function() {
+                count--;
+                return count;
+            },
+            getCount: function() {
+                return count;
+            }
+        };
+    }
+
+    const counter = createCounter();
+    console.log(counter.increment()); // 1
+    console.log(counter.increment()); // 2
+    console.log(counter.decrement()); // 1
+    console.log(counter.getCount());  // 1
+----
+
+=== this
+* Refers to an object instance
+** The value of what it refers to does not depends on how it is invoked not how it is called.
++
+[source,JavaScript]
+const obj = {
+  value: 1,
+  hello: function() {
+    console.log(this.value)
+  }
+}
+obj.hello() // 1
+const hey = obj.hello
+hey() // undefined
+
+** That's why we can have same methoods but different object and will result in different behavior
++
+[source,JavaScript]
+function getThis() {
+  return this;
+}
+const obj1 = { name: "obj1" };
+const obj2 = { name: "obj2" };
+obj1.getThis = getThis;
+obj2.getThis = getThis;
+console.log(obj1.getThis()); // { name: 'obj1', getThis: [Function: getThis] }
+console.log(obj2.getThis()); // { name: 'obj2', getThis: [Function: getThis] }
+
+
+* Therefore there really isn't a point to use this outside the object.
+* If used without an object, it will refers to global scope
+    ** In case of node.js & web
+    ** Under strict mode, both will refer to undefined
+    ** Under non-strict mode, web will refers to window
+    ** Under non-strict mode, node.js will refers to global 
+* Callback
+    ** In Arrow function and callback, once again it is referring to where this is called.
+
+== 更改 this 的值
+* Call, Apply, Bind
+    ** call: Basically just like normal function call
+    ** apply: like above, but the arguments are send in array
++
+[source,JavaScript]
+'use strict';
+function hello(a, b){
+  console.log(this, a, b)
+}
+hello.call('yo', 1, 2) // yo 1 2
+hello.apply('hihihi', [1, 2]) // hihihi 1 2
+
+
+    ** bind: can be used to locked in the value of this
++
+[source,JavaScript]
+'use strict';
+function hello() {
+  console.log(this)
+}
+const myHello = hello.bind('my')
+myHello.call('call') // my
+
+* Finally a little quiz
++
+[source, JavaScript]
+const obj = {
+  value: 1,
+  hello: function() {
+    console.log(this.value)
+  },
+  inner: {
+    value: 2,
+    hello: function() {
+      console.log(this.value)
+    }
+  }
+}
+const obj2 = obj.inner
+const hello = obj.inner.hello
+obj.inner.hello()
+obj2.hello()
+hello()
