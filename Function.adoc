@@ -3,13 +3,84 @@
 = JavaScript Functions
 
 == This
-* value defined by how function is invoked, not definition
-* refer to a context where a piece of code suppose to run
-    ** in an object method call, it will refer to the obj
-    ** in a function without object attached, it is refer to a global object/undefined (in nodejs is global, in web is window)
-    ** In arrow function this points to the parent scope when it is defined
-    ** points at object instance, so if object isnt there then there is no point really 
-    ** call bind apply
-    *** 
-    ***
-    ***
+* Refers to an object instance
+** The value of what it refers to does not depends on how it is invoked not how it is called.
++
+[source,JavaScript]
+const obj = {
+  value: 1,
+  hello: function() {
+    console.log(this.value)
+  }
+}
+obj.hello() // 1
+const hey = obj.hello
+hey() // undefined
+
+** That's why we can have same methoods but different object and will result in different behavior
++
+[source,JavaScript]
+function getThis() {
+  return this;
+}
+const obj1 = { name: "obj1" };
+const obj2 = { name: "obj2" };
+obj1.getThis = getThis;
+obj2.getThis = getThis;
+console.log(obj1.getThis()); // { name: 'obj1', getThis: [Function: getThis] }
+console.log(obj2.getThis()); // { name: 'obj2', getThis: [Function: getThis] }
+
+
+* Therefore there really isn't a point to use this outside the object.
+* If used without an object, it will refers to global scope
+    ** In case of node.js & web
+    ** Under strict mode, both will refer to undefined
+    ** Under non-strict mode, web will refers to window
+    ** Under non-strict mode, node.js will refers to global 
+* Callback
+    ** In Arrow function and callback, once again it is referring to where this is called.
+
+== 更改 this 的值
+* Call, Apply, Bind
+    ** call: Basically just like normal function call
+    ** apply: like above, but the arguments are send in array
++
+[source,JavaScript]
+'use strict';
+function hello(a, b){
+  console.log(this, a, b)
+}
+hello.call('yo', 1, 2) // yo 1 2
+hello.apply('hihihi', [1, 2]) // hihihi 1 2
+
+
+    ** bind: can be used to locked in the value of this
++
+[source,JavaScript]
+'use strict';
+function hello() {
+  console.log(this)
+}
+const myHello = hello.bind('my')
+myHello.call('call') // my
+
+* Finally a little quiz
++
+[source, JavaScript]
+const obj = {
+  value: 1,
+  hello: function() {
+    console.log(this.value)
+  },
+  inner: {
+    value: 2,
+    hello: function() {
+      console.log(this.value)
+    }
+  }
+}
+const obj2 = obj.inner
+const hello = obj.inner.hello
+obj.inner.hello()
+obj2.hello()
+hello()
