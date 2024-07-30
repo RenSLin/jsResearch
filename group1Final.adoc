@@ -17,13 +17,13 @@
 
 [source,javascript]
 ----
-let num = 42;
-let str = "Hello";
-let bool = true;
-let undef = undefined;
-let nul = null;
-let sym = Symbol("unique");
-let bigInt = 1234567890123456789012345678901234567890n;
+    let num = 42;
+    let str = "Hello";
+    let bool = true;
+    let undef = undefined;
+    let nul = null;
+    let sym = Symbol("unique");
+    let bigInt = 1234567890123456789012345678901234567890n;
 ----
 .物件型別：
 * Object
@@ -34,11 +34,11 @@ let bigInt = 1234567890123456789012345678901234567890n;
 
 [source,javascript]
 ----
-let obj = {name: "John", age: 30};
-let arr = [1, 2, 3, 4];
-let func = function() { console.log("Hello"); };
-let date = new Date();
-let regex = /abc/;
+    let obj = {name: "John", age: 30};
+    let arr = [1, 2, 3, 4];
+    let func = function() { console.log("Hello"); };
+    let date = new Date();
+    let regex = /abc/;
 ----
 
 === 顯性轉換/隱性轉換
@@ -52,32 +52,44 @@ let regex = /abc/;
 +
 [source,javascript]
 ----
-let num1 = Number("42");     // 42
-let num2 = Number("Hello");  // NaN
+    let num1 = Number("42");     // 42
+    let num2 = Number("Hello");  // NaN
 ----
 
 2. String(): 將值轉換為字符串。
 +
 [source,javascript]
 ----
-let str1 = String(42);     // "42"
-let str2 = String(true);   // "true"
+    let str1 = String(42);     // "42"
+    let str2 = String(true);   // "true"
 ----
 
 3. Boolean(): 將值轉換為布爾值。
 +
 [source,javascript]
 ----
-let bool1 = Boolean(1);     // true
-let bool2 = Boolean("");    // false
+    let bool1 = Boolean(1);     // true
+    let bool2 = Boolean("");    // false
 ----
-
+** 以下皆為false
++
+[source,javascript]
+----
+    console.log(Boolean(0));
+    console.log(Boolean(-0));
+    console.log(Boolean(0n));
+    console.log(Boolean(""));
+    console.log(Boolean(NaN));
+    console.log(Boolean(null));
+    console.log(Boolean(undefined));
+    console.log(Boolean(false));
+----
 4. Object(): 將值轉換為物件。
 +
 [source,javascript]
 ----
-let obj1 = Object(42);    // Number {42}
-let obj2 = Object("Hi");  // String {"Hi"}
+    let obj1 = Object(42);    // Number {42}
+    let obj2 = Object("Hi");  // String {"Hi"}
 ----
 
 * 方法轉型
@@ -136,11 +148,11 @@ let obj2 = Object("Hi");  // String {"Hi"}
 
 [source,javascript]
 ----
-let str4 = "123";
-        let num4 = 123;
-        
-        console.log(str4 == num4); // true
-        console.log(str4 === num4); // false
+    let str4 = "123";
+    let num4 = 123;
+    
+    console.log(str4 == num4); // true
+    console.log(str4 === num4); // false
 ----
 * 比較+隱形轉換
 
@@ -180,48 +192,47 @@ let str4 = "123";
 .字串
 [source,javascript]
 ----
-const print = (message) => {
-    console.log(`這是print ${message}`)
-}
+    const print = (message) => {
+        console.log(`這是print ${message}`)
+    }
 
-const helloMessage = () => {
-    return "Hello Message"
-}
+    const helloMessage = () => {
+        return "Hello Message"
+    }
 
-print(helloMessage());
-// 這是print Hello Message
+    print(helloMessage());
+    // 這是print Hello Message
 ----
 
 .陣列
 [source,javascript]
 ----
-const array = ["item0", (message) => console.log("我是陣列[1] " + message)]
+    const array = ["item0", (message) => console.log("我是陣列[1] " + message)]
 
-console.log(array[0]);
-// item0
-array[1]("Hello");
-// 我是陣列[1] Hello
+    console.log(array[0]);
+    // item0
+    array[1]("Hello");
+    // 我是陣列[1] Hello
 ----
 
 .物件
 [source,javascript]
 ----
-const hello = {
-    helloWorld: "Hello World",
-    print: (message) => {
-        console.log(`我是print  ${message}`)
+    const hello = {
+        helloWorld: "Hello World",
+        print: (message) => {
+            console.log(`我是print  ${message}`)
+        }
     }
-}
 
-object.print(hello.helloWorld);
-// 我是print Hello World
+    object.print(hello.helloWorld);
+    // 我是print Hello World
 ----
 
 === 閉包 Closure
 ==== 閉包是指一個函數可以記住並訪問它的詞法作用域，即使這個函數在其詞法作用域之外被調用。換句話說，閉包允許你從內部函數訪問外部函數的變量。
 [source,javascript]
 ----
-
     function createCounter() {
         var count = 0;
 
