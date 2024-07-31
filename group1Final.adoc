@@ -311,9 +311,9 @@ let str4 = "123";
 ----
 === 高階函式 Higher-Order Function
 ==== 當一個函式可以接受另一個函式作為參數，或者返回一個函式作為結果的函式
+==== 或是高階函式指的是該函式本身能不能接收函式當作參數，或是回傳函式作為回傳值。
 
 
-.字串
 [source,javascript]
 ----
 const print = (message) => {
@@ -323,34 +323,37 @@ const print = (message) => {
 const helloMessage = () => {
     return "Hello Message"
 }
-
-print(helloMessage());
+console.log(print(helloMessage()));
 // 這是print Hello Message
 ----
 
-.陣列
+
 [source,javascript]
 ----
-const array = ["item0", (message) => console.log("我是陣列[1] " + message)]
-
-console.log(array[0]);
-// item0
-array[1]("Hello");
-// 我是陣列[1] Hello
-----
-
-.物件
-[source,javascript]
-----
-const hello = {
-    helloWorld: "Hello World",
-    print: (message) => {
-        console.log(`我是print  ${message}`)
-    }
+// 參數是一個函式跟兩個參數
+const fun = (fun1, a, b) => {
+    return fun1(a, b);
 }
 
-object.print(hello.helloWorld);
-// 我是print Hello World
+const add = (x, y) => x + y;
+const multiply = (x, y) => x * y;
+
+console.log(fun(add, 5, 3));       // 輸出: 8
+console.log(fun(multiply, 5, 3));  // 輸出: 15
+----
+
+[source,javascript]
+----
+const greet = (name) => {
+    return `Hello, ${name}!`;
+};
+
+const print = (fun, input) => {
+    console.log(fun(input));
+};
+
+console.log(greet('Alice'));
+print(greet, "Alice");
 ----
 
 === 閉包 Closure
@@ -482,3 +485,4 @@ const hello = obj.inner.hello
 obj.inner.hello()
 obj2.hello()
 hello()
+
