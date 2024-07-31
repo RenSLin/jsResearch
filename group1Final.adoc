@@ -392,7 +392,7 @@ print(greet, "Alice");
 ----
 === this
 * Refers to an object instance
-** The value of what it refers to does not depends on how it is invoked not how it is called.
+** The value of what it refers to does not depends on how it is defined not how it is invoked.
 +
 [source,JavaScript]
 const obj = {
@@ -425,6 +425,9 @@ console.log(obj2.getThis()); // { name: 'obj2', getThis: [Function: getThis] }
     ** Under strict mode, both will refer to undefined
     ** Under non-strict mode, web will refers to window
     ** Under non-strict mode, node.js will refers to global
+
+* Callback
+    ** In Arrow function and callback, once again it is referring to where this is called.
 +
 [source,JavaScript]
 var obj = {
@@ -438,13 +441,12 @@ var obj = {
 }
 obj.sum(obj.getData);//Window
 
-* Callback
-    ** In Arrow function and callback, once again it is referring to where this is called.
-
 == 更改 this 的值
 * Call, Apply, Bind
     ** call: Basically just like normal function call
+    *** takes call(obj,args1,args2....)
     ** apply: like above, but the arguments are send in array
+    *** usage: apply(obj, [args1,args2..])
 +
 [source,JavaScript]
 'use strict';
