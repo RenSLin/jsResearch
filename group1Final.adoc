@@ -356,45 +356,36 @@ object.print(hello.helloWorld);
 === 閉包 Closure
 ==== 閉包（Closure）是函式以及該函式被宣告時所在的作用域環境（lexical environment）的組合。
 
-* 語法作用域
+.語法作用域
 [source,javascript]
 ----
-    function init() {
-        var name = "Mozilla"; // name 是個由 init 建立的局部變數
-        function displayName() {    // displayName() 是內部函式，一個閉包
-            alert(name); // 使用了父函式宣告的變數
-        }
-        displayName();
-    }
-    init();
-----
-* 閉包
-[source,javascript]
-----
-    function makeFunc() {
-        var name = "Mozilla";
-        function displayName() {
-            alert(name);
-        }
-        return displayName;
+    // 計數器
+    let counter = 0;
+        
+    function add() {
+        counter += 1;
+        return counter;
     }
 
-    var myFunc = makeFunc();
-    myFunc();
+    add();
 ----
+* 如果counter被竄改怎麼辦?
+
+.閉包
 [source,javascript]
 ----
-    function makeFunc() {
-        var x = 5;
-        function displayName(y) {
-            return x+y;
+    function add() {
+        let counter = 0;
+
+        function plus(){
+            counter += 1;
+            return counter;
         }
-        return displayName;
+        return plus;
     }
 
-    var myFunc = makeFunc();
-    console.log(myFunc(5));
-    console.log(myFunc(10));
+    let a = add();
+    a();
 ----
 === this
 * Refers to an object instance
@@ -426,11 +417,24 @@ console.log(obj2.getThis()); // { name: 'obj2', getThis: [Function: getThis] }
 
 
 * Therefore there really isn't a point to use this outside the object.
-* If used without an object, it will refers to global scope
+* If used without an object, it will refers to global scope, with default binding like below
     ** In case of node.js & web
     ** Under strict mode, both will refer to undefined
     ** Under non-strict mode, web will refers to window
-    ** Under non-strict mode, node.js will refers to global 
+    ** Under non-strict mode, node.js will refers to global
++
+[source,JavaScript]
+var obj = {
+	price : 20,
+	sum : function (cb){
+		cb(100);
+	},
+    getData : function (val){
+        console.log(this,val);
+    }
+}
+obj.sum(obj.getData);//Window
+
 * Callback
     ** In Arrow function and callback, once again it is referring to where this is called.
 
