@@ -85,21 +85,44 @@ console.log(Object.is(null, undefined))// false
 ----
 
 == this
-* Refers to an object instance
-** The value of what it refers to does not depends on how it is defined not how it is invoked.
+* Refers to an object instance that contains the current function this resides in.
+** what it refers to does not depends on how it is defined not how it is invoked. +
+影響 this 的是在於函式的呼叫方法，並非宣告的時機
 +
 [source,JavaScript]
-const obj = {
-  value: 1,
-  hello: function() {
-    console.log(this.value)
-  }
+----
+function hello(){
+    console.log(this.name);
 }
-obj.hello() // 1
-const hey = obj.hello
-hey() // undefined
 
-** That's why we can have same methoods but different object and will result in different behavior
+var name = "Ren";
+const foo = {
+    name: "Jack",
+    hello: hello
+}
+
+hello() //Ren
+foo.hello() //Jack
+----
++
+[source,JavaScript]
+----
+function showName(){
+    console.log(this.name);
+}
+
+var name = "Jeff";
+const foo = {
+    name: "Bob",
+    showName: showName
+}
+
+printName = foo.showName;
+printName();
+----
+
+
+**  理所當然的，不同 method 在不同 object 會有不同的結論
 +
 [source,JavaScript]
 function getThis() {
@@ -113,13 +136,12 @@ console.log(obj1.getThis()); // { name: 'obj1', getThis: [Function: getThis] }
 console.log(obj2.getThis()); // { name: 'obj2', getThis: [Function: getThis] }
 
 
-* Therefore there really isn't a point to use this outside the object.
-* If used without an object, it will refers to global scope, with default binding like below
-    ** In case of node.js & web
-    ** Under strict mode, both will refer to undefined
-    ** Under non-strict mode, web will refers to window
+* 如 this 被呼叫的 function 不指向特定的物件時，this 會 refer to global object.
+    ** Node.js & Browser under strict mode both will refer to undefined
+    ** Under non-strict mode, browser will refers to window
     ** Under non-strict mode, node.js will refers to global
 
+== Arrow function and Callback
 * Callback
     ** In Arrow function and callback, once again it is referring to where this is called.
 +
@@ -161,24 +183,14 @@ function hello() {
 const myHello = hello.bind('my')
 myHello.call('call') // my
 
-* Finally a little quiz
+
+* This 優先順序
+. Arrow function
+. new keyword
+. call, apply, bind
+. object method
+. global object
+
 +
-[source, JavaScript]
-const obj = {
-  value: 1,
-  hello: function() {
-    console.log(this.value)
-  },
-  inner: {
-    value: 2,
-    hello: function() {
-      console.log(this.value)
-    }
-  }
-}
-const obj2 = obj.inner
-const hello = obj.inner.hello
-obj.inner.hello()
-obj2.hello()
-hello()
+[source,JavaScript]
 
