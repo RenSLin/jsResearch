@@ -1,0 +1,184 @@
+:source-highlighter: highlight.js
+:highlightjs-theme: atom-one-dark-reasonable
+
+== 型別比較 三種不同的comparison operator
+    ** strict equality
+        *** ===
+            **** 這個 operator 在進行比較時不會 perfrom type conversion.
+            Conditions::
+            . 不同型別 => false
+            . 同型別 => same value then true
+
+[source,JavaScript]
+----
+const num = 0;
+const obj = new String("0");
+const str = "0";
+
+console.log(num === num); // true
+console.log(obj === obj); // true
+console.log(str === str); // true
+
+console.log(num === obj); // false
+console.log(num === str); // false
+console.log(obj === str); // false
+console.log(null === undefined); // false
+console.log(obj === null); // false
+console.log(obj === undefined); // false
+----
+    ** loose equality
+        *** ==
+            **** 這個 operator 在進行比較時會 perfrom type conversion. +
+             Steps::
+            . 如果 operands 是同型別 以下會回 true
+            .. Object: reference same object
+            .. String: same characters in the same order
+            .. Boolean: both true or both false
+            .. BigInt: same value
+            .. Symbol: same symbol
+            .. Number: same value. But NaN on either side will result false.
+            . 如其中一個 operands 是 null 或 undefined, 另一側也要是 null 或undefined to return true. Otherwise return false.
+            . 如其中一側為 object 另一側為 primitive, convert object to primitive
+            . 這一步基本上就是 case by case
+            .. Same type => step 1
+            .. 一側為 Symbol 另一側不是　=> false
+            .. 一側為 Boolean 另一側不是　=> Convert to number, then loosely compare again
+            .. 一側為 number 另一側為 String => Convert String to number, failed to convert then NaN
+            .. 一側為 number 另一側為 BigInt => compare numeric value
+            .. 一側為 String 另一側為 BigInt => Convert String to BigInt then compare
+        
+[source,JavaScript]
+----
+const num = 0;
+const big = 0n;
+const str = "0";
+const obj = new String("0");
+
+console.log(num == str); // true
+console.log(big == num); // true
+console.log(str == big); // true
+
+console.log(num == obj); // true
+console.log(big == obj); // true
+console.log(str == obj); // true
+----
+
+ ** Object.is()
+ *** Same Value Equality(同值相等)
+    Definition::
+        whether two values are functionally identical in all contexts +
+        比較兩個值是否功能相同
+        
+[source,JavaScript]
+----
+console.log(+0 == -0); // true
+console.log(+0 === -0); // true
+console.log(Object.is(+0, -0)); // false;
+
+console.log(NaN == NaN); // false
+console.log(NaN === NaN); // false
+console.log(Object.is(NaN, NaN)); // true
+
+console.log(null == undefined); // true
+console.log(null === undefined); // false
+console.log(Object.is(null, undefined))// false
+----
+
+== this
+* Refers to an object instance
+** The value of what it refers to does not depends on how it is defined not how it is invoked.
++
+[source,JavaScript]
+const obj = {
+  value: 1,
+  hello: function() {
+    console.log(this.value)
+  }
+}
+obj.hello() // 1
+const hey = obj.hello
+hey() // undefined
+
+** That's why we can have same methoods but different object and will result in different behavior
++
+[source,JavaScript]
+function getThis() {
+  return this;
+}
+const obj1 = { name: "obj1" };
+const obj2 = { name: "obj2" };
+obj1.getThis = getThis;
+obj2.getThis = getThis;
+console.log(obj1.getThis()); // { name: 'obj1', getThis: [Function: getThis] }
+console.log(obj2.getThis()); // { name: 'obj2', getThis: [Function: getThis] }
+
+
+* Therefore there really isn't a point to use this outside the object.
+* If used without an object, it will refers to global scope, with default binding like below
+    ** In case of node.js & web
+    ** Under strict mode, both will refer to undefined
+    ** Under non-strict mode, web will refers to window
+    ** Under non-strict mode, node.js will refers to global
+
+* Callback
+    ** In Arrow function and callback, once again it is referring to where this is called.
++
+[source,JavaScript]
+var obj = {
+	price : 20,
+	sum : function (cb){
+		cb(100);
+	},
+    getData : function (val){
+        console.log(this,val);
+    }
+}
+obj.sum(obj.getData);//Window
+
+== 更改 this 的值
+* Call, Apply, Bind
+    ** call: Basically just like normal function call
+    *** takes call(obj,args1,args2....)
+    ** apply: like above, but the arguments are send in array
+    *** usage: apply(obj, [args1,args2..])
++
+[source,JavaScript]
+'use strict';
+function hello(a, b){
+  console.log(this, a, b)
+}
+hello.call('yo', 1, 2) // yo 1 2
+hello.apply('hihihi', [1, 2]) // hihihi 1 2
+
+
+    ** bind: can be used to locked in the value of this
++
+[source,JavaScript]
+'use strict';
+function hello() {
+  console.log(this)
+}
+const myHello = hello.bind('my')
+myHello.call('call') // my
+
+* Finally a little quiz
++
+[source, JavaScript]
+const obj = {
+  value: 1,
+  hello: function() {
+    console.log(this.value)
+  },
+  inner: {
+    value: 2,
+    hello: function() {
+      console.log(this.value)
+    }
+  }
+}
+const obj2 = obj.inner
+const hello = obj.inner.hello
+obj.inner.hello()
+obj2.hello()
+hello()
+
