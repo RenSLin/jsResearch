@@ -85,7 +85,29 @@ console.log(Object.is(null, undefined))// false
 ----
 
 == this
-* Refers to an object instance that contains the current function this resides in.
+* Execution Context
+** Now what is going on under the hood
+* Binding
+    ** Default Binding
+    *** 當 function 是在普通、未經修飾的情況下被呼叫，也就是當 function 被呼叫的當下如果沒有值的情況下的defauly binding 就是 global object。
+    ** Implicit Binding
+    *** function 被宣告成為某個物件的參考屬性。在那個 function 被呼叫的當下，該 function 即被那個物件所包含
+    ** Explicit Binding
+    *** bind() call() apply()
+    ** new keyword Binding
+    *** 當我們用 new 產生一個新的物件時會自動綁定 this
++
+[source,Javascript]
+----
+function ex(a) {
+  this.a = a;
+}
+
+var objEx = new ex( 123 );
+console.log( objEx.a ); 
+----
+
+* This refers to an object instance that contains the current function this resides in.
 ** what it refers to does not depends on how it is defined not how it is invoked. +
 影響 this 的是在於函式的呼叫方法，並非宣告的時機
 +
@@ -121,8 +143,7 @@ printName = foo.showName;
 printName();
 ----
 
-
-**  理所當然的，不同 method 在不同 object 會有不同的結論
+** 不同 method 在不同 object 會有不同的結論
 +
 [source,JavaScript]
 function getThis() {
@@ -141,56 +162,206 @@ console.log(obj2.getThis()); // { name: 'obj2', getThis: [Function: getThis] }
     ** Under non-strict mode, browser will refers to window
     ** Under non-strict mode, node.js will refers to global
 
-== Arrow function and Callback
-* Callback
-    ** In Arrow function and callback, once again it is referring to where this is called.
+== Callback
+* 在 Callback 的情況下，同理記得剛剛說的: +
+    _影響 this 的是在於函式的呼叫方法，並非宣告的時機_
 +
 [source,JavaScript]
-var obj = {
-	price : 20,
-	sum : function (cb){
-		cb(100);
-	},
-    getData : function (val){
-        console.log(this,val);
-    }
+----
+function t0() {
+    console.log(this.d)
 }
-obj.sum(obj.getData);//Window
+
+var d = 'beagles'
+
+var obj0 = {
+    d: 'dachshund',
+    t0:t0
+}
+
+function cbTest(fn){
+    fn()
+}
+cbTest(obj0.t0);
+----
++
+[source,JavaScript]
+----
+var input = 1;
+function square() { 
+ let cbFn = function(){ console.log(this.input*this.input) };
+ setTimeout( cbFn , 1000);
+};
+var obj = {
+ input : 3,
+ square: square
+};
+obj.square(); // 1
+----
+* What happened?
+
+
+== Arrow Function
+*  arrow function 它本身不會去 bind 一個scope，而是會lexcial binding 去往外去找它的 scope。
++
+[source,JavaScript]
+----
+const o = {
+    value: 42,
+    regularFunction: function() {
+        console.log('Regular function:', this.value); // `this` refers to `obj`
+    },
+    arrowFunction: () => {
+        console.log('Arrow function:', this.value); // `this` refers to the global object
+    }
+};
+
+o.regularFunction(); // Output: Regular function: 42
+o.arrowFunction();   // Output: Arrow function: undefined (or global.value if defined)
+----
++
+[source,JavaScript]
+----
+const obj = {
+  count: 10,
+  doSomethingLater() {
+    setTimeout(function () {
+      // the function executes on the window scope
+      this.count++;
+      console.log(this.count);
+    }, 300);
+  },
+};
+
+obj.doSomethingLater(); // logs "NaN", because the property "count" is not in the window scope.
+----
++
+[source,Javascript]
+----
+const obj = {
+  count: 10,
+  doSomethingLater() {
+    // The method syntax binds "this" to the "obj" context.
+    setTimeout(() => {
+      // Since the arrow function doesn't have its own binding and
+      // setTimeout (as a function call) doesn't create a binding
+      // itself, the "obj" context of the outer method is used.
+      this.count++;
+      console.log(this.count);
+    }, 300);
+  },
+};
+
+obj.doSomethingLater(); // logs 11
+----
 
 == 更改 this 的值
+* Let's take a look at something first
++
+[source,Javascript]
+----
+function t1() {
+    console.log(this.dog)
+}
+
+var dog = 'husky'
+
+var obj1 = {
+    dog: 'pubs',
+    t1:t1
+}
+
+var alien = obj1.t1
+alien() 
+----
+
 * Call, Apply, Bind
-    ** call: Basically just like normal function call
-    *** takes call(obj,args1,args2....)
-    ** apply: like above, but the arguments are send in array
-    *** usage: apply(obj, [args1,args2..])
+    ** call(): 以給予的 this value 及 arguments 去呼叫該 function +
+    Usage:: call(obj,args1,args2....)
+    ** apply(): 如同 call, 但給予的 arguments 為 array +
+    Usage:: apply(obj, [args1,args2..])
+    ** bindWIP(): 回傳一個新的 function 且用提供的 this 去執行該 function +
+    Usage:: bind(obj,args1,args2...)
 +
-[source,JavaScript]
-'use strict';
-function hello(a, b){
-  console.log(this, a, b)
+[source,Javascript]
+----
+function cab() { 
+  console.log(this.key);
 }
-hello.call('yo', 1, 2) // yo 1 2
-hello.apply('hihihi', [1, 2]) // hihihi 1 2
+var objA = { key : "A" };
+var objB = { key : "B" };
 
+cab.call(objA) // A
+cab.apply(objB) // B
 
-    ** bind: can be used to locked in the value of this
+var bindedcab = cab.bind(objA);
+bindedcab(); // A;
+var doubleBindedcab = bindedcab.bind(objB);
+doubleBindedcab() // A (Once binded the value of this can't be changed)
+----
+* 常見的使用情形
+** 按下按鈕後執行 ajax，但在 callback function 的 this 卻不是你想像中的那樣
 +
-[source,JavaScript]
-'use strict';
-function hello() {
-  console.log(this)
+[source, JavaScript]
+----
+// button & click event.
+var el = document.getElementById("btn");
+
+el.addEventListener("click", function(event) {
+  console.log( this.textContent );
+
+  $ajax('[URL]', function(res) {
+    // this.textContent => undefined
+    console.log(this.textContent, res);
+  });
+}, false);
+----
+** we can rewrite it with bind
++
+[source,Javascript]
+----
+el.addEventListener("click", function(event) {
+  console.log( this.textContent );
+
+  // 透過 bind(this) 來強制指定該 function scope 的 this
+  $ajax('[URL]', function(res) {
+    console.log(this.textContent, res);
+  }.bind(this));
+
+}, false);
+----
+
+== this in Jquery
+* this
+** 使用上跟JS一樣， 一樣會指向所屬的 object instance
++
+[source,Javascript]
+----
+const obj = {
+    name: "hrithik",
+    roll: 36,
+    mydata: function () {
+        return this.name;
+    }
 }
-const myHello = hello.bind('my')
-myHello.call('call') // my
-
-
-* This 優先順序
-. Arrow function
-. new keyword
-. call, apply, bind
-. object method
-. global object
-
+document.getElementById("paraID")
+    .innerHTML = obj.mydata();
+----
 +
-[source,JavaScript]
+[source,Javascript]
+----
+$("#clickme").click(function () {
+    this.style.color = "green"
+    })
+----
+* $(this)
+** 一樣會指向所屬的 object instance，但 $(this) 是一個 Jquery object 就可以使用 Jquery 的 function and methods。
++
+[source,Javascript]
+----
+$(".div1").click(function () {
+    
+    $(this).hide();
+});
+----
 
