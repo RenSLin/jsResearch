@@ -12,19 +12,19 @@
 [source,JavaScript]
 ----
 const num = 0;
-const obj = new String("0");
+const nihl = new String("0");
 const str = "0";
 
 console.log(num === num); // true
-console.log(obj === obj); // true
+console.log(nihl === nihl); // true
 console.log(str === str); // true
 
-console.log(num === obj); // false
+console.log(num === nihl); // false
 console.log(num === str); // false
-console.log(obj === str); // false
+console.log(nihl === str); // false
 console.log(null === undefined); // false
-console.log(obj === null); // false
-console.log(obj === undefined); // false
+console.log(nihl === null); // false
+console.log(nihl === undefined); // false
 ----
     ** loose equality
         *** ==
@@ -84,9 +84,10 @@ console.log(null === undefined); // false
 console.log(Object.is(null, undefined))// false
 ----
 
-== this
-* Execution Context
-** Now what is going on under the hood
+== This: Housekeeping
+* Execution Context and its stack
+** function execution context -created when function called
+** global execution context -created when program runs
 * Binding
     ** Default Binding
     *** 當 function 是在普通、未經修飾的情況下被呼叫，也就是當 function 被呼叫的當下如果沒有值的情況下的defauly binding 就是 global object。
@@ -106,6 +107,8 @@ function ex(a) {
 var objEx = new ex( 123 );
 console.log( objEx.a ); 
 ----
+
+== This
 
 * This refers to an object instance that contains the current function this resides in.
 ** what it refers to does not depends on how it is defined not how it is invoked. +
@@ -134,12 +137,12 @@ function showName(){
 }
 
 var name = "Jeff";
-const foo = {
+const foo2 = {
     name: "Bob",
     showName: showName
 }
 
-printName = foo.showName;
+printName = foo2.showName; //doesn't do what you would think 
 printName();
 ----
 
@@ -192,21 +195,21 @@ function square() {
  let cbFn = function(){ console.log(this.input*this.input) };
  setTimeout( cbFn , 1000);
 };
-var obj = {
+var obj4 = {
  input : 3,
  square: square
 };
-obj.square(); // 1
+obj4.square(); // 1
 ----
 * What happened?
 
 
 == Arrow Function
-*  arrow function 它本身不會去 bind 一個scope，而是會lexcial binding 去往外去找它的 scope。
+*  arrow function 它本身不會去 bind 一個scope，而是會lexcial scoping 去往外去找它的 this。
 +
 [source,JavaScript]
 ----
-const o = {
+const af = {
     value: 42,
     regularFunction: function() {
         console.log('Regular function:', this.value); // `this` refers to `obj`
@@ -216,8 +219,8 @@ const o = {
     }
 };
 
-o.regularFunction(); // Output: Regular function: 42
-o.arrowFunction();   // Output: Arrow function: undefined (or global.value if defined)
+af.regularFunction(); // Output: Regular function: 42
+af.arrowFunction();   // Output: Arrow function: undefined (or global.value if defined)
 ----
 +
 [source,JavaScript]
@@ -266,12 +269,12 @@ function t1() {
 
 var dog = 'husky'
 
-var obj1 = {
+var obj5 = {
     dog: 'pubs',
     t1:t1
 }
 
-var alien = obj1.t1
+var alien = obj5.t1
 alien() 
 ----
 
@@ -280,7 +283,7 @@ alien()
     Usage:: call(obj,args1,args2....)
     ** apply(): 如同 call, 但給予的 arguments 為 array +
     Usage:: apply(obj, [args1,args2..])
-    ** bindWIP(): 回傳一個新的 function 且用提供的 this 去執行該 function +
+    ** bind(): 回傳一個新的 function 且用提供的 this 去執行該 function +
     Usage:: bind(obj,args1,args2...)
 +
 [source,Javascript]
@@ -298,37 +301,6 @@ var bindedcab = cab.bind(objA);
 bindedcab(); // A;
 var doubleBindedcab = bindedcab.bind(objB);
 doubleBindedcab() // A (Once binded the value of this can't be changed)
-----
-* 常見的使用情形
-** 按下按鈕後執行 ajax，但在 callback function 的 this 卻不是你想像中的那樣
-+
-[source, JavaScript]
-----
-// button & click event.
-var el = document.getElementById("btn");
-
-el.addEventListener("click", function(event) {
-  console.log( this.textContent );
-
-  $ajax('[URL]', function(res) {
-    // this.textContent => undefined
-    console.log(this.textContent, res);
-  });
-}, false);
-----
-** we can rewrite it with bind
-+
-[source,Javascript]
-----
-el.addEventListener("click", function(event) {
-  console.log( this.textContent );
-
-  // 透過 bind(this) 來強制指定該 function scope 的 this
-  $ajax('[URL]', function(res) {
-    console.log(this.textContent, res);
-  }.bind(this));
-
-}, false);
 ----
 
 == this in Jquery
